@@ -1,5 +1,5 @@
+import 'package:bytebank/screens/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(BytebankApp());
@@ -17,7 +17,9 @@ class BytebankApp extends StatelessWidget {
         primaryColor: primaryColor,
         primaryColorLight: primaryColorLight,
         accentColor: accentColor,
-        brightness: Brightness.dark,
+        appBarTheme: AppBarTheme(
+          brightness: Brightness.dark,
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateColor.resolveWith((states) => accentColor),
@@ -26,56 +28,6 @@ class BytebankApp extends StatelessWidget {
         floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accentColor),
       ),
       home: Dashboard(),
-    );
-  }
-}
-
-class Dashboard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Dashboard'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset('images/bytebank_logo.png'),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 100,
-              width: 150,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.people,
-                    color: theme.primaryColorLight,
-                    size: 24,
-                  ),
-                  Text(
-                    'Contacts',
-                    style: TextStyle(
-                      color: theme.primaryColorLight,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-              color: theme.primaryColor,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

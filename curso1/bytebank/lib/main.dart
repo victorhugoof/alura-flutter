@@ -9,12 +9,17 @@ class BytebankApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Colors.green[900];
+    final primaryColorLight = Colors.white;
     final accentColor = Colors.blueAccent[700];
 
     return MaterialApp(
-      theme: ThemeData(
+      theme: ThemeData.light().copyWith(
         primaryColor: primaryColor,
+        primaryColorLight: primaryColorLight,
         accentColor: accentColor,
+        appBarTheme: AppBarTheme(
+          brightness: Brightness.dark,
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateColor.resolveWith((states) => accentColor),

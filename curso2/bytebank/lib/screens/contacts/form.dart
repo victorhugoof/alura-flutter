@@ -1,5 +1,6 @@
 import 'package:bytebank/components/text_editor.dart';
-import 'package:bytebank/models/contact_model.dart';
+import 'package:bytebank/database/app_database.dart';
+import 'package:bytebank/models/contact.dart';
 import 'package:flutter/material.dart';
 
 const _labelAppBarCreate = 'New Contact';
@@ -15,7 +16,7 @@ const _labelButtonCreate = 'Create';
 const _labelButtonEdit = 'Save';
 
 class ContactForm extends StatefulWidget {
-  final ContactModel editing;
+  final Contact editing;
   ContactForm({this.editing});
 
   @override
@@ -93,12 +94,16 @@ class _ContactFormState extends State<ContactForm> {
       return;
     }
 
-    Navigator.pop(context, _persistContact(name, accountNumberInt));
+    final Contact contact = _createOrChangeContact(name, accountNumberInt);
+    saveContact(contact).then((e) => Navigator.pop(context, contact)).catchError((er) {
+      debugPrint('$er');
+      _showSnackbar(context, 'Ocorreu um erro: $er');
+    });
   }
 
-  ContactModel _persistContact(String name, int accoutNumber) {
+  Contact _createOrChangeContact(String name, int accoutNumber) {
     if (widget.editing == null) {
-      return ContactModel(
+      return Contact(
         name: name,
         accountNumber: accoutNumber,
       );

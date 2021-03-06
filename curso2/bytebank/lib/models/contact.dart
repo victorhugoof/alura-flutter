@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class ContactModel {
+class Contact {
+  int id;
   String name;
   int accountNumber;
 
-  ContactModel({
+  Contact({
+    this.id,
     @required this.name,
     @required this.accountNumber,
   });
 
   @override
   String toString() {
-    return 'ContactModel{name: $name, accountNumber: $accountNumber}';
+    return 'Contact{id: $id, name: $name, accountNumber: $accountNumber}';
   }
 }

@@ -1,4 +1,5 @@
-import 'package:bytebank/models/contact_model.dart';
+import 'package:bytebank/database/app_database.dart';
+import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/screens/contacts/form.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,7 @@ const _labelButtonEdit = 'Edit';
 const _labelButtonDelete = 'Delete';
 
 class ContactList extends StatefulWidget {
-  final List<ContactModel> _contacts = <ContactModel>[];
+  final List<Contact> _contacts = <Contact>[];
 
   @override
   _ContactListState createState() {
@@ -21,6 +22,8 @@ class ContactList extends StatefulWidget {
 class _ContactListState extends State<ContactList> {
   @override
   Widget build(BuildContext context) {
+    _loadContacts();
+
     return Scaffold(
       appBar: AppBar(title: Text(_labelAppBar)),
       body: ListView.builder(
@@ -38,11 +41,24 @@ class _ContactListState extends State<ContactList> {
     );
   }
 
+  void _loadContacts() {
+    if (widget._contacts.length == 0) {
+      listContacts().then((value) {
+        setState(() {
+          widget._contacts.addAll(value);
+        });
+      }).catchError((er) {
+        debugPrint('$er');
+        _showSnackbar(context, 'Ocorreu um erro: $er');
+      });
+    }
+  }
+
   void _showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _editOrCreate(ContactModel contact) {
+  void _editOrCreate(Contact contact) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ContactForm(editing: contact)),
@@ -58,21 +74,25 @@ class _ContactListState extends State<ContactList> {
     });
   }
 
-  void _delete(ContactModel contact) {
+  void _delete(Contact contact) {
     if (contact != null) {
-      setState(() {
-        if (widget._contacts.remove(contact)) {
+      deleteContact(contact).then((value) {
+        setState(() {
+          widget._contacts.remove(contact);
           _showSnackbar(context, _messageContactDeleted);
-        }
+        });
+      }).catchError((er) {
+        debugPrint('$er');
+        _showSnackbar(context, 'Ocorreu um erro: $er');
       });
     }
   }
 }
 
 class ContactItem extends StatelessWidget {
-  final ContactModel contact;
-  final void Function(ContactModel value) onEdit;
-  final void Function(ContactModel value) onDelete;
+  final Contact contact;
+  final void Function(Contact value) onEdit;
+  final void Function(Contact value) onDelete;
 
   ContactItem({
     @required this.contact,

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const _labelAppBar = 'Dashboard';
+const _assetBytebankImage = 'images/bytebank_logo.png';
 const _labelButtonContacts = 'Contacts';
 const _labelButtonNew = 'New';
 const _labelButtonSetttings = 'Settings';
@@ -20,24 +21,30 @@ class Dashboard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('images/bytebank_logo.png'),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Image.asset(_assetBytebankImage),
+            ),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                DashboardButton(
-                  icon: Icons.people,
-                  title: _labelButtonContacts,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ContactList()),
-                    );
-                  },
-                ),
-                DashboardButton(icon: Icons.add, title: _labelButtonNew, onPressed: () {}),
-                DashboardButton(icon: Icons.settings, title: _labelButtonSetttings, onPressed: () {}),
-              ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  DashboardButton(
+                    icon: Icons.people,
+                    title: _labelButtonContacts,
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ContactList()),
+                      );
+                    },
+                  ),
+                  DashboardButton(icon: Icons.add, title: _labelButtonNew, onPressed: () {}),
+                  DashboardButton(icon: Icons.settings, title: _labelButtonSetttings, onPressed: () {}),
+                ],
+              ),
             ),
           )
         ],
@@ -62,7 +69,7 @@ class DashboardButton extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 8.0),
+      padding: const EdgeInsets.only(left: 4.0, right: 4.0),
       child: Material(
         color: theme.primaryColor,
         borderRadius: BorderRadius.circular(5),

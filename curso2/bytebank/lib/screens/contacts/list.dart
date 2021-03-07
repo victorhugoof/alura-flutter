@@ -1,4 +1,4 @@
-import 'package:bytebank/database/app_database.dart';
+import 'package:bytebank/database/dao/dao_factory.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/screens/contacts/form.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,14 +19,15 @@ class ContactList extends StatefulWidget {
 }
 
 class _ContactListState extends State<ContactList> {
+  List<Contact> _contacts;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_labelAppBar)),
-      body: FutureBuilder<List<Contact>>(
-        future: listContacts(),
+      body: FutureBuilder<void>(
+        future: _listContacts(),
         builder: (context, snapshot) {
-          print(snapshot.connectionState);
           if (snapshot.connectionState != ConnectionState.done) {
             final progressWidth = (MediaQuery.of(context).size.width * 0.4).roundToDouble();
             final strokeWidth = progressWidth / 20;
@@ -43,7 +44,7 @@ class _ContactListState extends State<ContactList> {
             );
           }
 
-          if (snapshot.hasError) {
+          if (snapshot.hasError || _contacts == null) {
             final error = snapshot.error;
             return FractionallySizedBox(
               heightFactor: 1,
@@ -82,13 +83,12 @@ class _ContactListState extends State<ContactList> {
             );
           }
 
-          final List<Contact> contacts = snapshot.hasData ? snapshot.data : [];
           return ListView.builder(
-            itemCount: contacts.length,
+            itemCount: _contacts.length,
             itemBuilder: (context, index) {
-              final isLast = index == contacts.length - 1;
+              final isLast = index == _contacts.length - 1;
               return _ContactItem(
-                contact: contacts[index],
+                contact: _contacts[index],
                 padding: EdgeInsets.only(bottom: isLast ? 72 : 0),
                 onEdit: (contact) => _editOrCreate(context, contact),
                 onDelete: (contact) => _delete(context, contact),
@@ -104,8 +104,25 @@ class _ContactListState extends State<ContactList> {
     );
   }
 
+  Future<void> _listContacts() async {
+    if (this._contacts == null) {
+      this._contacts = await DaoFactory.getContactDao().findAll();
+    }
+  }
+
   void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   void _editOrCreate(BuildContext context, Contact contact) {
@@ -115,7 +132,9 @@ class _ContactListState extends State<ContactList> {
     ).then((value) {
       if (value != null) {
         if (contact == null) {
-          setState(() {});
+          setState(() {
+            _contacts.add(value);
+          });
         }
         _showSnackbar(context, contact == null ? _messageContactCreated : _messageContactEdited);
       }
@@ -124,9 +143,12 @@ class _ContactListState extends State<ContactList> {
 
   void _delete(BuildContext context, Contact contact) {
     if (contact != null) {
-      deleteContact(contact).then((value) {
-        setState(() {});
-        _showSnackbar(context, _messageContactDeleted);
+      DaoFactory.getContactDao().delete(contact).then((value) {
+        setState(() {
+          if (_contacts.remove(contact)) {
+            _showSnackbar(context, _messageContactDeleted);
+          }
+        });
       }).catchError((er) {
         debugPrint('$er');
         _showSnackbar(context, 'Ocorreu um erro: $er');
@@ -172,8 +194,30 @@ class _ContactItem extends StatelessWidget {
             },
             itemBuilder: (context) {
               return <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(value: 'edit', child: Text(_labelButtonEdit)),
-                const PopupMenuItem<String>(value: 'delete', child: Text(_labelButtonDelete)),
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.edit),
+                      ),
+                      Text(_labelButtonEdit),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.delete),
+                      ),
+                      Text(_labelButtonDelete),
+                    ],
+                  ),
+                ),
               ];
             },
           ),

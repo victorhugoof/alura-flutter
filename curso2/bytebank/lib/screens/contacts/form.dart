@@ -1,5 +1,5 @@
 import 'package:bytebank/components/text_editor.dart';
-import 'package:bytebank/database/app_database.dart';
+import 'package:bytebank/database/dao/dao_factory.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:flutter/material.dart';
 
@@ -71,7 +71,18 @@ class _ContactFormState extends State<ContactForm> {
   }
 
   void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   void _saveContact(BuildContext context) {
@@ -94,11 +105,17 @@ class _ContactFormState extends State<ContactForm> {
       return;
     }
 
-    final Contact contact = _createOrChangeContact(name, accountNumberInt);
-    saveContact(contact).then((e) => Navigator.pop(context, contact)).catchError((er) {
-      debugPrint('$er');
-      _showSnackbar(context, 'Ocorreu um erro: $er');
-    });
+    _persistContact(_createOrChangeContact(name, accountNumberInt));
+  }
+
+  Future<void> _persistContact(Contact contact) async {
+    try {
+      await DaoFactory.getContactDao().save(contact);
+      Navigator.pop(context, contact);
+    } catch (e) {
+      debugPrint('$e');
+      _showSnackbar(context, 'Ocorreu um erro: $e');
+    }
   }
 
   Contact _createOrChangeContact(String name, int accoutNumber) {

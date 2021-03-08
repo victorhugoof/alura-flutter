@@ -116,12 +116,6 @@ class _ContactListState extends State<ContactList> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          },
-        ),
       ),
     );
   }

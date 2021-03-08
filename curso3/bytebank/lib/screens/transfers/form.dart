@@ -1,10 +1,18 @@
 import 'package:bytebank/components/text_editor.dart';
 import 'package:bytebank/database/dao/dao_factory.dart';
+import 'package:bytebank/exception/business_exception.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transfer.dart';
 import 'package:flutter/material.dart';
 
 const _labelAppBarCreate = 'New Transfer';
+const _labelName = 'Full name';
+const _requiredName = 'Name is required!';
+const _hintName = 'Full name';
+const _labelAccountNumber = 'Account number';
+const _hintAccountNumber = '0000';
+const _requiredAccountNumber = 'Account number is required!';
+const _invalidAccountNumber = 'Invalid account number! Use only numbers';
 const _labelValue = 'Value';
 const _hintValue = '0,00';
 const _requiredValue = 'Value is required!';
@@ -13,6 +21,7 @@ const _labelButtonCreate = 'Create';
 
 class TransferForm extends StatefulWidget {
   final Contact contact;
+
   TransferForm({
     @required this.contact,
   });
@@ -24,6 +33,8 @@ class TransferForm extends StatefulWidget {
 }
 
 class _TransferFormState extends State<TransferForm> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _accountNumberController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
 
   @override
@@ -33,6 +44,7 @@ class _TransferFormState extends State<TransferForm> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            ..._getContactForm(context),
             TextEditor(
               labelText: _labelValue,
               controller: _valueController,
@@ -45,7 +57,7 @@ class _TransferFormState extends State<TransferForm> {
                 width: double.maxFinite,
                 child: ElevatedButton(
                   child: Text(_labelButtonCreate),
-                  onPressed: () => _saveTransfer(context),
+                  onPressed: () => _save(context),
                 ),
               ),
             ),
@@ -55,46 +67,86 @@ class _TransferFormState extends State<TransferForm> {
     );
   }
 
+  List<Widget> _getContactForm(BuildContext context) {
+    if (widget.contact != null) {
+      return [];
+    }
+
+    return [
+      TextEditor(
+        labelText: _labelName,
+        controller: _nameController,
+        fontSize: 24.0,
+        hintText: _hintName,
+      ),
+      TextEditor(
+        labelText: _labelAccountNumber,
+        controller: _accountNumberController,
+        fontSize: 24.0,
+        hintText: _hintAccountNumber,
+        keyboardType: TextInputType.number,
+      )
+    ];
+  }
+
   void _showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          },
-        ),
       ),
     );
   }
 
-  void _saveTransfer(BuildContext context) {
-    final String value = _valueController.text;
+  void _save(BuildContext context) {
+    _saveTransfer(context).then((value) {
+      Navigator.pop(context, value);
+    }).catchError((e) {
+      debugPrint('$e');
+      _showSnackbar(context, '$e');
+    });
+  }
 
+  Future<Transfer> _saveTransfer(BuildContext context) async {
+    Contact _contact = widget.contact;
+    if (_contact == null) {
+      _contact = await _saveContact(context);
+    }
+
+    final String value = _valueController.text;
     if (value == null || value.length == 0) {
-      _showSnackbar(context, _requiredValue);
-      return;
+      throw BusinessException(_requiredValue);
     }
 
     final double valueDouble = double.tryParse(value);
     if (valueDouble == null) {
-      _showSnackbar(context, _invalidValue);
-      return;
+      throw BusinessException(_invalidValue);
     }
 
-    Transfer transfer = Transfer(value: valueDouble, contact: widget.contact);
-    _persistTransfer(transfer);
+    Transfer transfer = Transfer(value: valueDouble, contact: _contact);
+    await DaoFactory.getTransferDao().save(transfer);
+    return transfer;
   }
 
-  Future<void> _persistTransfer(Transfer transfer) async {
-    try {
-      await DaoFactory.getTransferDao().save(transfer);
-      Navigator.pop(context, transfer);
-    } catch (e) {
-      debugPrint('$e');
-      _showSnackbar(context, 'Ocorreu um erro: $e');
+  Future<Contact> _saveContact(BuildContext context) async {
+    final String name = _nameController.text;
+    final String accountNumber = _accountNumberController.text;
+
+    if (name == null || name.length == 0) {
+      throw BusinessException(_requiredName);
     }
+
+    if (accountNumber == null || accountNumber.length == 0) {
+      throw BusinessException(_requiredAccountNumber);
+    }
+
+    final int accountNumberInt = int.tryParse(accountNumber);
+    if (accountNumberInt == null) {
+      throw BusinessException(_invalidAccountNumber);
+    }
+
+    Contact contact = Contact(name: name, accountNumber: accountNumberInt);
+    await DaoFactory.getContactDao().save(contact);
+    return contact;
   }
 }

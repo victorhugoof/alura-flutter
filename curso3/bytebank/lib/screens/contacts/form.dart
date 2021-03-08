@@ -17,6 +17,7 @@ const _labelButtonEdit = 'Save';
 
 class ContactForm extends StatefulWidget {
   final Contact editing;
+
   ContactForm({this.editing});
 
   @override
@@ -75,12 +76,6 @@ class _ContactFormState extends State<ContactForm> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          },
-        ),
       ),
     );
   }

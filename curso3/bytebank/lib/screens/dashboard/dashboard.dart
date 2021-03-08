@@ -9,6 +9,7 @@ const _assetBytebankImage = 'images/bytebank_logo.png';
 const _labelButtonTransfer = 'Transfer';
 const _labelButtonTransactionFeed = 'Transaction Feed';
 const _labelButtonContacts = 'Contacts';
+
 typedef PushRouteWidget = Widget Function();
 
 class Dashboard extends StatelessWidget {

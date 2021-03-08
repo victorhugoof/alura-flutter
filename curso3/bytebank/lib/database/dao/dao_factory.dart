@@ -1,6 +1,7 @@
-import 'package:bytebank/database/dao/contact_dao.dart';
 import 'package:bytebank/database/dao/dao.dart';
-import 'package:bytebank/database/dao/transfer_dao.dart';
+import 'package:bytebank/database/dao/impl/contact_dao.dart';
+import 'package:bytebank/database/dao/impl/transfer_dao.dart';
+import 'package:bytebank/exception/business_exception.dart';
 
 abstract class DaoFactory {
   static final Map<Type, dynamic> _instances = {};
@@ -36,6 +37,6 @@ abstract class DaoFactory {
       case TransferDao:
         return TransferDao();
     }
-    throw new Exception('Instantiate exception!');
+    throw BusinessException('Instantiate exception!');
   }
 }

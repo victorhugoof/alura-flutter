@@ -35,7 +35,6 @@ Future<void> onConfigure(Database database) async {
 
 Future<void> onCreate(Database database, int version) async {
   for (var dao in DaoFactory.getAll()) {
-    print('$dao#onCreate');
     await dao.onCreate(database, version);
   }
 }

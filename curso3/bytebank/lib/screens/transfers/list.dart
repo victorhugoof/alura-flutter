@@ -1,5 +1,6 @@
 import 'package:bytebank/database/dao/dao_factory.dart';
 import 'package:bytebank/models/contact.dart';
+import 'package:bytebank/models/transfer.dart';
 import 'package:bytebank/screens/transfers/form.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -111,12 +112,6 @@ class _TransferListState extends State<TransferList> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          },
-        ),
       ),
     );
   }
@@ -131,7 +126,15 @@ class _TransferListState extends State<TransferList> {
   }
 
   void _newContactAndTransfer(BuildContext context) {
-    print('new contact and transfer');
+    Navigator.push<Transfer>(
+      context,
+      MaterialPageRoute(builder: (context) => TransferForm(contact: null)),
+    ).then((value) {
+      setState(() {
+        this._contacts.add(value.contact);
+        _showSnackbar(context, _messageTransferCreated);
+      });
+    });
   }
 }
 

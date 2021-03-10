@@ -1,13 +1,18 @@
-import 'package:bytebank/database/dao/dao_factory.dart';
+import 'package:bytebank/components/centered_error.dart';
+import 'package:bytebank/components/centered_message.dart';
+import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/dao/dao_factory.dart';
+import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
-import 'package:bytebank/models/transfer.dart';
+import 'package:bytebank/models/transaction.dart';
 import 'package:bytebank/screens/transfers/form.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-const _labelAppBar = 'Transfers';
-const _messageTransferCreated = 'Transfer created successfully!';
-const _listErroText = 'An error occurred while list contacts!';
+const _labelAppBar = 'Transactions';
+const _messageTransactionCreated = 'Transaction created successfully!';
+const _listErrorText = 'Unknown error';
+const _listEmptyText = 'No contacts found';
 
 class TransferList extends StatefulWidget {
   @override
@@ -27,57 +32,20 @@ class _TransferListState extends State<TransferList> {
         future: _listContacts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            final progressWidth = (MediaQuery.of(context).size.width * 0.4).roundToDouble();
-            final strokeWidth = progressWidth / 20;
+            return Progress();
+          }
 
-            return Center(
-              child: SizedBox(
-                height: progressWidth,
-                width: progressWidth,
-                child: CircularProgressIndicator(
-                  strokeWidth: strokeWidth,
-                  valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                ),
-              ),
+          if (snapshot.hasError) {
+            return CenteredError(
+              error: snapshot.error,
+              errorText: _listErrorText,
             );
           }
 
-          if (snapshot.hasError || _contacts == null) {
-            final error = snapshot.error;
-            return FractionallySizedBox(
-              heightFactor: 1,
-              widthFactor: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 96),
-                      child: Icon(
-                        Icons.error,
-                        size: 120,
-                      ),
-                    ),
-                    Text(
-                      _listErroText,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Text(
-                        '$error',
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          if (_contacts == null || _contacts.isEmpty) {
+            return CenteredMessage(
+              message: _listEmptyText,
+              icon: Icons.warning,
             );
           }
 
@@ -85,10 +53,11 @@ class _TransferListState extends State<TransferList> {
             itemCount: _contacts.length,
             itemBuilder: (context, index) {
               final isLast = index == _contacts.length - 1;
+              final contact = _contacts[index];
               return _ContactItem(
-                contact: _contacts[index],
+                contact: contact,
                 padding: EdgeInsets.only(bottom: isLast ? 72 : 0),
-                onClick: (contact) => _newTransfer(context, contact),
+                onClick: () => _newTransaction(context, contact),
               );
             },
           );
@@ -96,7 +65,7 @@ class _TransferListState extends State<TransferList> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => _newContactAndTransfer(context),
+        onPressed: () => _newContactAndTransaction(context),
       ),
     );
   }
@@ -107,33 +76,22 @@ class _TransferListState extends State<TransferList> {
     }
   }
 
-  void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
-  void _newTransfer(BuildContext context, Contact contact) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => TransferForm(contact: contact)),
-    ).then((value) {
-      _showSnackbar(context, _messageTransferCreated);
+  void _newTransaction(BuildContext context, Contact contact) {
+    Utils.pushRoute<Transaction>(context, () => TransactionForm(contact: contact)).then((value) {
+      if (value != null) {
+        Utils.showSnackbar(context, _messageTransactionCreated);
+      }
     });
   }
 
-  void _newContactAndTransfer(BuildContext context) {
-    Navigator.push<Transfer>(
-      context,
-      MaterialPageRoute(builder: (context) => TransferForm(contact: null)),
-    ).then((value) {
-      setState(() {
-        this._contacts.add(value.contact);
-        _showSnackbar(context, _messageTransferCreated);
-      });
+  void _newContactAndTransaction(BuildContext context) {
+    Utils.pushRoute<Transaction>(context, () => TransactionForm(contact: null)).then((value) {
+      if (value != null) {
+        setState(() {
+          this._contacts.add(value.contact);
+          Utils.showSnackbar(context, _messageTransactionCreated);
+        });
+      }
     });
   }
 }
@@ -141,7 +99,7 @@ class _TransferListState extends State<TransferList> {
 class _ContactItem extends StatelessWidget {
   final Contact contact;
   final EdgeInsetsGeometry padding;
-  final void Function(Contact contact) onClick;
+  final void Function() onClick;
 
   _ContactItem({
     @required this.contact,
@@ -155,7 +113,7 @@ class _ContactItem extends StatelessWidget {
       padding: padding,
       child: Card(
         child: ListTile(
-          onTap: () => onClick(contact),
+          onTap: () => onClick(),
           title: Text(
             contact.name,
             style: TextStyle(fontSize: 24.0),

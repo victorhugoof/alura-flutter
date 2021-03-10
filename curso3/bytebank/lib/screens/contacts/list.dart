@@ -1,4 +1,8 @@
-import 'package:bytebank/database/dao/dao_factory.dart';
+import 'package:bytebank/components/centered_error.dart';
+import 'package:bytebank/components/centered_message.dart';
+import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/dao/dao_factory.dart';
+import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/screens/contacts/form.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +14,8 @@ const _messageContactEdited = 'Contact edited successfully!';
 const _messageContactDeleted = 'Contact deleted successfully!';
 const _labelButtonEdit = 'Edit';
 const _labelButtonDelete = 'Delete';
-const _listErroText = 'An error occurred while list contacts!';
+const _listErrorText = 'Unknown error';
+const _listEmptyText = 'No contacts found';
 
 class ContactList extends StatefulWidget {
   @override
@@ -30,57 +35,20 @@ class _ContactListState extends State<ContactList> {
         future: _listContacts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            final progressWidth = (MediaQuery.of(context).size.width * 0.4).roundToDouble();
-            final strokeWidth = progressWidth / 20;
+            return Progress();
+          }
 
-            return Center(
-              child: SizedBox(
-                height: progressWidth,
-                width: progressWidth,
-                child: CircularProgressIndicator(
-                  strokeWidth: strokeWidth,
-                  valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                ),
-              ),
+          if (snapshot.hasError) {
+            return CenteredError(
+              error: snapshot.error,
+              errorText: _listErrorText,
             );
           }
 
-          if (snapshot.hasError || _contacts == null) {
-            final error = snapshot.error;
-            return FractionallySizedBox(
-              heightFactor: 1,
-              widthFactor: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 96),
-                      child: Icon(
-                        Icons.error,
-                        size: 120,
-                      ),
-                    ),
-                    Text(
-                      _listErroText,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Text(
-                        '$error',
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          if (_contacts == null || _contacts.isEmpty) {
+            return CenteredMessage(
+              message: _listEmptyText,
+              icon: Icons.warning,
             );
           }
 
@@ -111,27 +79,15 @@ class _ContactListState extends State<ContactList> {
     }
   }
 
-  void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
   void _editOrCreate(BuildContext context, Contact contact) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ContactForm(editing: contact)),
-    ).then((value) {
+    Utils.pushRoute(context, () => ContactForm(editing: contact)).then((value) {
       if (value != null) {
         if (contact == null) {
           setState(() {
             _contacts.add(value);
           });
         }
-        _showSnackbar(context, contact == null ? _messageContactCreated : _messageContactEdited);
+        Utils.showSnackbar(context, contact == null ? _messageContactCreated : _messageContactEdited);
       }
     });
   }
@@ -141,12 +97,12 @@ class _ContactListState extends State<ContactList> {
       DaoFactory.getContactDao().delete(contact).then((value) {
         setState(() {
           if (_contacts.remove(contact)) {
-            _showSnackbar(context, _messageContactDeleted);
+            Utils.showSnackbar(context, _messageContactDeleted);
           }
         });
       }).catchError((er) {
         debugPrint('$er');
-        _showSnackbar(context, 'Ocorreu um erro: $er');
+        Utils.showSnackbar(context, '$er');
       });
     }
   }

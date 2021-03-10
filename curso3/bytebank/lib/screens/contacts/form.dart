@@ -1,5 +1,6 @@
 import 'package:bytebank/components/text_editor.dart';
-import 'package:bytebank/database/dao/dao_factory.dart';
+import 'package:bytebank/dao/dao_factory.dart';
+import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:flutter/material.dart';
 
@@ -71,32 +72,23 @@ class _ContactFormState extends State<ContactForm> {
     );
   }
 
-  void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
   void _saveContact(BuildContext context) {
     final String name = _nameController.text;
     final String accountNumber = _accountNumberController.text;
 
     if (name == null || name.length == 0) {
-      _showSnackbar(context, _requiredName);
+      Utils.showSnackbar(context, _requiredName);
       return;
     }
 
     if (accountNumber == null || accountNumber.length == 0) {
-      _showSnackbar(context, _requiredAccountNumber);
+      Utils.showSnackbar(context, _requiredAccountNumber);
       return;
     }
 
     final int accountNumberInt = int.tryParse(accountNumber);
     if (accountNumberInt == null) {
-      _showSnackbar(context, _invalidAccountNumber);
+      Utils.showSnackbar(context, _invalidAccountNumber);
       return;
     }
 
@@ -106,10 +98,10 @@ class _ContactFormState extends State<ContactForm> {
   Future<void> _persistContact(Contact contact) async {
     try {
       await DaoFactory.getContactDao().save(contact);
-      Navigator.pop(context, contact);
+      Utils.pop(context, contact);
     } catch (e) {
       debugPrint('$e');
-      _showSnackbar(context, 'Ocorreu um erro: $e');
+      Utils.showSnackbar(context, '$e');
     }
   }
 

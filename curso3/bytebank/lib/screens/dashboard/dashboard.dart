@@ -1,3 +1,4 @@
+import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/screens/contacts/list.dart';
 import 'package:bytebank/screens/transactions/list.dart';
 import 'package:bytebank/screens/transfers/list.dart';
@@ -6,11 +7,9 @@ import 'package:flutter/material.dart';
 
 const _labelAppBar = 'Dashboard';
 const _assetBytebankImage = 'images/bytebank_logo.png';
-const _labelButtonTransfer = 'Transfer';
+const _labelButtonTransaction = 'Transfer';
 const _labelButtonTransactionFeed = 'Transaction Feed';
 const _labelButtonContacts = 'Contacts';
-
-typedef PushRouteWidget = Widget Function();
 
 class Dashboard extends StatelessWidget {
   @override
@@ -39,11 +38,11 @@ class Dashboard extends StatelessWidget {
                 children: [
                   DashboardButton(
                     icon: Icons.monetization_on,
-                    title: _labelButtonTransfer,
+                    title: _labelButtonTransaction,
                     onPressed: () => _showTransferList(context),
                   ),
                   DashboardButton(
-                    icon: Icons.file_present,
+                    icon: Icons.description,
                     title: _labelButtonTransactionFeed,
                     onPressed: () => _showTransactionFeed(context),
                   ),
@@ -62,21 +61,15 @@ class Dashboard extends StatelessWidget {
   }
 
   _showTransferList(BuildContext context) {
-    _pushRoute(context, () => TransferList());
+    Utils.pushRoute(context, () => TransferList());
   }
 
   _showTransactionFeed(BuildContext context) {
-    _pushRoute(context, () => TransactionList());
+    Utils.pushRoute(context, () => TransactionList());
   }
 
   _showContactList(BuildContext context) {
-    _pushRoute(context, () => ContactList());
-  }
-
-  Future<T> _pushRoute<T extends Object>(BuildContext context, PushRouteWidget widget) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => widget()),
-    );
+    Utils.pushRoute(context, () => ContactList());
   }
 }
 

@@ -1,5 +1,4 @@
-import 'package:bytebank/database/app_database.dart';
-import 'package:bytebank/database/dao/dao.dart';
+import 'package:bytebank/dao/dao.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
@@ -14,7 +13,7 @@ class ContactDao extends Dao {
   }
 
   Future<List<Contact>> findAll() async {
-    final db = await createDatabase();
+    final db = await getDb();
 
     try {
       final rs = await db.query('contacts', orderBy: 'id ASC');
@@ -25,7 +24,7 @@ class ContactDao extends Dao {
   }
 
   Future<Contact> findById(int id) async {
-    final db = await createDatabase();
+    final db = await getDb();
 
     try {
       final rs = await db.query('contacts', where: 'id = ?', whereArgs: [id], orderBy: 'id ASC');
@@ -39,7 +38,7 @@ class ContactDao extends Dao {
   }
 
   Future<void> save(Contact contact) async {
-    final db = await createDatabase();
+    final db = await getDb();
 
     try {
       if (contact.id != null) {
@@ -58,7 +57,7 @@ class ContactDao extends Dao {
   }
 
   Future<void> delete(Contact contact) async {
-    final db = await createDatabase();
+    final db = await getDb();
 
     try {
       if (contact.id != null) {

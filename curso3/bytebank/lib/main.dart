@@ -1,6 +1,9 @@
 import 'package:bytebank/screens/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 
+const dbName = 'bytebank.db';
+const dbVersion = 1;
+
 void main() {
   runApp(BytebankApp());
 }

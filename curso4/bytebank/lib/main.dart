@@ -1,5 +1,6 @@
-import 'package:bytebank/screens/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
+
+import 'screens/dashboard/dashboard.dart';
 
 const dbName = 'bytebank.db';
 const dbVersion = 1;
@@ -29,11 +30,21 @@ class BytebankApp extends StatelessWidget {
           ),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accentColor),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateColor.resolveWith((states) => primaryColor),
+          ),
+        ),
         snackBarTheme: SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+        ),
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: primaryColor,
+          selectionColor: primaryColor,
+          selectionHandleColor: primaryColor,
         ),
       ),
       home: Dashboard(),

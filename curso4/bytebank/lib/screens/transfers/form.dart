@@ -1,6 +1,8 @@
+import 'package:bytebank/components/auth_dialog.dart';
 import 'package:bytebank/components/text_editor.dart';
 import 'package:bytebank/dao/dao_factory.dart';
 import 'package:bytebank/exception/business_exception.dart';
+import 'package:bytebank/exception/service_exception.dart';
 import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
@@ -119,16 +121,33 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   void _save(BuildContext context) {
-    _saveTransaction(context).then((value) {
-      print(value);
-      Utils.pop(context, value);
-    }).catchError((e) {
-      debugPrint('$e');
-      Utils.showSnackbar(context, '$e');
-    });
+    showDialog(
+      context: context,
+      builder: (contextDialog) => AuthDialog(
+        onConfirm: (password, localAuth) {
+          if (localAuth) {
+            password = '1000';
+          }
+
+          _saveTransaction(context, password).then((value) {
+            Navigator.pop(context, value);
+          }).catchError((e, s) {
+            Utils.logError(e, s);
+            if (e.runtimeType == ServiceException) {
+              final serviceException = (e as ServiceException);
+              if (serviceException.statusCode == 401) {
+                Utils.showSnackbar(context, 'Senha inválida!');
+                return;
+              }
+            }
+            Utils.showSnackbar(context, '$e');
+          });
+        },
+      ),
+    );
   }
 
-  Future<Transaction> _saveTransaction(BuildContext context) async {
+  Future<Transaction> _saveTransaction(BuildContext context, String password) async {
     Contact _contact = widget.contact;
     if (_contact == null) {
       _contact = await _saveContact(context);
@@ -144,10 +163,12 @@ class _TransactionFormState extends State<TransactionForm> {
       throw BusinessException(_invalidValue);
     }
 
-    Transaction transaction = await ServiceFactory.getTransactionService().save(Transaction(
-      value: valueDouble,
-      contact: _contact,
-    ));
+    Transaction transaction = await ServiceFactory.getTransactionService().save(
+        Transaction(
+          value: valueDouble,
+          contact: _contact,
+        ),
+        password);
 
     if (transaction != null) {
       /* Esta alteração é feita por conta do mapeamento do banco de dados, para o contato retornado possuir ID */

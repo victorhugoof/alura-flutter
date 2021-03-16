@@ -33,7 +33,7 @@ class _ContactListState extends State<ContactList> {
       appBar: AppBar(title: Text(_labelAppBar)),
       body: FutureBuilder<void>(
         future: _listContacts(),
-        builder: (context, snapshot) {
+        builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Progress();
           }
@@ -54,7 +54,7 @@ class _ContactListState extends State<ContactList> {
 
           return ListView.builder(
             itemCount: _contacts.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (contextItemBuilder, index) {
               final isLast = index == _contacts.length - 1;
               return _ContactItem(
                 contact: _contacts[index],
@@ -100,9 +100,9 @@ class _ContactListState extends State<ContactList> {
             Utils.showSnackbar(context, _messageContactDeleted);
           }
         });
-      }).catchError((er) {
-        debugPrint('$er');
-        Utils.showSnackbar(context, '$er');
+      }).catchError((e, s) {
+        Utils.logError(e, s);
+        Utils.showSnackbar(context, '$e');
       });
     }
   }
@@ -143,7 +143,7 @@ class _ContactItem extends StatelessWidget {
                 onDelete(contact);
               }
             },
-            itemBuilder: (context) {
+            itemBuilder: (contextItemBuilder) {
               return <PopupMenuEntry<String>>[
                 PopupMenuItem<String>(
                   value: 'edit',

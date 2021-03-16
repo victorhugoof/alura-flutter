@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bytebank/exception/business_exception.dart';
+import 'package:bytebank/exception/service_exception.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http_interceptor.dart';
@@ -46,10 +46,7 @@ abstract class Service {
     final String reason = _getReason(response);
     final int statusCode = response.statusCode;
 
-    if (message != null) {
-      throw new BusinessException('$message [$statusCode - $reason]');
-    }
-    throw new BusinessException('$statusCode - $reason');
+    throw new ServiceException(message, statusCode, reason);
   }
 
   String _getReason(Response response) {

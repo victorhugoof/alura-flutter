@@ -92,15 +92,15 @@ class _ContactFormState extends State<ContactForm> {
       return;
     }
 
-    _persistContact(_createOrChangeContact(name, accountNumberInt));
+    _persistContact(context, _createOrChangeContact(name, accountNumberInt));
   }
 
-  Future<void> _persistContact(Contact contact) async {
+  Future<void> _persistContact(BuildContext context, Contact contact) async {
     try {
       await DaoFactory.getContactDao().save(contact);
-      Utils.pop(context, contact);
-    } catch (e) {
-      debugPrint('$e');
+      Navigator.pop(context, contact);
+    } catch (e, s) {
+      Utils.logError(e, s);
       Utils.showSnackbar(context, '$e');
     }
   }

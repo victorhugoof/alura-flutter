@@ -26,7 +26,7 @@ class _TransactionListState extends State<TransactionList> {
       appBar: AppBar(title: Text(_labelAppBar)),
       body: FutureBuilder<void>(
         future: _listTransactions(),
-        builder: (context, snapshot) {
+        builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Progress();
           }
@@ -47,7 +47,7 @@ class _TransactionListState extends State<TransactionList> {
 
           return ListView.builder(
             itemCount: _transactions.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (contextItemBuilder, index) {
               return _TransactionItem(transaction: _transactions[index]);
             },
           );

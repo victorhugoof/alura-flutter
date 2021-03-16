@@ -30,7 +30,7 @@ class _TransferListState extends State<TransferList> {
       appBar: AppBar(title: Text(_labelAppBar)),
       body: FutureBuilder<void>(
         future: _listContacts(),
-        builder: (context, snapshot) {
+        builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Progress();
           }
@@ -51,7 +51,7 @@ class _TransferListState extends State<TransferList> {
 
           return ListView.builder(
             itemCount: _contacts.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (contextItemBuilder, index) {
               final isLast = index == _contacts.length - 1;
               final contact = _contacts[index];
               return _ContactItem(

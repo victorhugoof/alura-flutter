@@ -4,7 +4,7 @@ typedef PushRouteWidget = Widget Function();
 
 abstract class Utils {
   static void showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -14,11 +14,11 @@ abstract class Utils {
 
   static Future<T> pushRoute<T extends Object>(BuildContext context, PushRouteWidget widget) {
     return Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => widget()),
+      MaterialPageRoute(builder: (contextMaterialPageRoute) => widget()),
     );
   }
 
-  static void pop<T extends Object>(BuildContext context, [T result]) {
-    return Navigator.of(context).pop(result);
+  static void logError(dynamic e, StackTrace s) {
+    debugPrintStack(label: 'ERROR ${e.runtimeType}: ${e.toString()}', stackTrace: s);
   }
 }

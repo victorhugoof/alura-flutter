@@ -11,9 +11,9 @@ class TransactionService extends Service {
     return result.map((e) => Transaction.fromJson(e)).toList();
   }
 
-  Future<Transaction> save(Transaction transaction) async {
+  Future<Transaction> save(Transaction transaction, String password) async {
     final Response response = await super.post('/transactions', body: transaction.toJson(), headers: {
-      'password': '1000',
+      'password': password,
     });
     return Transaction.fromJson(jsonDecode(response.body));
   }

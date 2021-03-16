@@ -1,4 +1,7 @@
+import 'package:bytebank/exception/service_exception.dart';
 import 'package:flutter/material.dart';
+
+import '../exception/business_exception.dart';
 
 typedef PushRouteWidget = Widget Function();
 
@@ -19,6 +22,10 @@ abstract class Utils {
   }
 
   static void logError(dynamic e, StackTrace s) {
+    if (e is BusinessException || e is ServiceException) {
+      debugPrint('ERROR ${e.runtimeType}: ${e.toString()}');
+      return;
+    }
     debugPrintStack(label: 'ERROR ${e.runtimeType}: ${e.toString()}', stackTrace: s);
   }
 }

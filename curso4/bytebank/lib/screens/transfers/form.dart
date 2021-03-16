@@ -1,4 +1,5 @@
 import 'package:bytebank/components/auth_dialog.dart';
+import 'package:bytebank/components/response_dialog.dart';
 import 'package:bytebank/components/text_editor.dart';
 import 'package:bytebank/dao/dao_factory.dart';
 import 'package:bytebank/exception/business_exception.dart';
@@ -8,6 +9,8 @@ import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
 import 'package:bytebank/service/service_factory.dart';
 import 'package:flutter/material.dart';
+
+import '../../exception/business_exception.dart';
 
 const _labelAppBarCreate = 'New Transaction';
 const _labelAppBarCreateContactAndTransaction = 'New Contact and Transaction';
@@ -61,6 +64,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 fontSize: 24.0,
                 hintText: _hintValue,
                 margin: const EdgeInsets.only(top: 16.0),
+                keyboardType: TextInputType.number,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
@@ -121,27 +125,38 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   void _save(BuildContext context) {
+    FocusScope.of(context).unfocus();
     showDialog(
       context: context,
       builder: (contextDialog) => AuthDialog(
-        onConfirm: (password, localAuth) {
-          if (localAuth) {
-            password = '1000';
-          }
-
-          _saveTransaction(context, password).then((value) {
-            Navigator.pop(context, value);
-          }).catchError((e, s) {
-            Utils.logError(e, s);
-            if (e.runtimeType == ServiceException) {
-              final serviceException = (e as ServiceException);
-              if (serviceException.statusCode == 401) {
-                Utils.showSnackbar(context, 'Senha inválida!');
-                return;
-              }
+        onConfirm: (password, localAuth) async {
+          try {
+            if (localAuth) {
+              password = '1000';
             }
-            Utils.showSnackbar(context, '$e');
-          });
+
+            final value = await _saveTransaction(context, password);
+            Navigator.pop(context, value);
+          } catch (e, s) {
+            Utils.logError(e, s);
+
+            if (e is BusinessException) {
+              Utils.showSnackbar(context, e.message);
+            } else {
+              String _message = '$e';
+              if (e is ServiceException) {
+                if (e.reason != null) {
+                  _message = e.reason;
+                } else if (e.message != null) {
+                  _message = e.message;
+                } else {
+                  _message = 'There was an error';
+                }
+              }
+
+              showDialog(context: context, builder: (contextDialog) => FailureDialog(_message));
+            }
+          }
         },
       ),
     );

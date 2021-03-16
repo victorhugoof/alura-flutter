@@ -8,10 +8,8 @@ const _confirmText = 'Confirm';
 
 class AuthDialog extends StatefulWidget {
   final Function(String password, bool localAuth) onConfirm;
-  final Function() onCancel;
   AuthDialog({
     this.onConfirm,
-    this.onCancel,
   });
 
   @override
@@ -77,9 +75,6 @@ class _AuthDialogState extends State<AuthDialog> {
   }
 
   void _cancel() {
-    if (this.widget.onCancel != null) {
-      this.widget.onCancel();
-    }
     Navigator.pop(context);
   }
 

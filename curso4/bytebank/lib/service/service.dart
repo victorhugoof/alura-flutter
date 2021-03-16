@@ -8,7 +8,10 @@ import 'package:http_interceptor/http_interceptor.dart';
 abstract class Service {
   @protected
   Future<Response> get(String url, {Map<String, String> headers}) async {
-    final Response response = await _getClient().get(_getUri(url), headers: headers);
+    final Response response = await _getClient().get(
+      _getUri(url),
+      headers: _getHeaders(headers),
+    );
 
     if (_isError(response)) {
       _throwError(response);
@@ -72,6 +75,9 @@ abstract class Service {
         }
       }
     } catch (ignored) {}
+    if (response.body != null && response.body.length > 0) {
+      return response.body;
+    }
     return null;
   }
 
@@ -86,6 +92,10 @@ abstract class Service {
 
     if (!headers.containsKey('Content-Type')) {
       headers['Content-Type'] = 'application/json';
+    }
+
+    if (!headers.containsKey("Accept")) {
+      headers['Accept'] = 'application/json';
     }
 
     return headers;

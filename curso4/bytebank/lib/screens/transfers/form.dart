@@ -9,6 +9,7 @@ import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
 import 'package:bytebank/service/service_factory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:uuid/uuid.dart';
 
 const _labelAppBarCreate = 'New Transaction';
@@ -154,6 +155,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 password = '1000';
               }
 
+              print('confimed password: $password');
               _showLoading();
               final value = await _saveTransaction(context, password);
               Navigator.pop(context, value);
@@ -169,15 +171,29 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   void _showLoading() {
-    setState(() {
+    if (!_sending) {
       _sending = true;
-    });
+      _rebuild();
+    }
   }
 
   void _hideLoading() {
-    setState(() {
+    if (_sending) {
       _sending = false;
-    });
+      _rebuild();
+    }
+  }
+
+  Future<bool> _rebuild() async {
+    if (!mounted) return false;
+
+    if (SchedulerBinding.instance.schedulerPhase != SchedulerPhase.idle) {
+      await SchedulerBinding.instance.endOfFrame;
+      if (!mounted) return false;
+    }
+
+    setState(() {});
+    return true;
   }
 
   Future<Transaction> _saveTransaction(BuildContext context, String password) async {

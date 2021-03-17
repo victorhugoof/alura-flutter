@@ -16,7 +16,7 @@ class TextEditor extends StatelessWidget {
   TextEditor({
     @required this.labelText,
     this.controller,
-    this.readOnly,
+    this.readOnly = false,
     this.errorText,
     this.fontSize = 16.0,
     this.hintText,
@@ -25,7 +25,7 @@ class TextEditor extends StatelessWidget {
     this.margin = const EdgeInsets.all(16.0),
     this.maxLength,
     this.prefixText,
-  });
+  }) : assert(readOnly != null);
 
   @override
   Widget build(BuildContext context) {

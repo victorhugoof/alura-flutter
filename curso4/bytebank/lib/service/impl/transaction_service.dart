@@ -12,7 +12,7 @@ class TransactionService extends BaseService {
   }
 
   Future<Transaction> save(Transaction transaction, String password) async {
-    await Future.delayed(Duration(seconds: 10));
+    await Future.delayed(Duration(seconds: 2));
     final Response response = await super.post('/transactions', body: transaction.toJson(), headers: {
       'password': password,
     });

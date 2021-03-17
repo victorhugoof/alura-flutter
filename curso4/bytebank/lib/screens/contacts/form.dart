@@ -101,7 +101,7 @@ class _ContactFormState extends State<ContactForm> {
       Navigator.pop(context, contact);
     } catch (e, s) {
       Utils.logError(e, s);
-      Utils.showSnackbar(context, '$e');
+      Utils.showSnackbarError(context, e);
     }
   }
 

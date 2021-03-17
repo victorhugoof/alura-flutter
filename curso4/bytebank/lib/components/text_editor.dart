@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class TextEditor extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
+  final bool readOnly;
   final String errorText;
   final double fontSize;
   final String hintText;
@@ -15,6 +16,7 @@ class TextEditor extends StatelessWidget {
   TextEditor({
     @required this.labelText,
     this.controller,
+    this.readOnly,
     this.errorText,
     this.fontSize = 16.0,
     this.hintText,
@@ -31,6 +33,7 @@ class TextEditor extends StatelessWidget {
       padding: margin,
       child: TextField(
         controller: controller,
+        readOnly: readOnly,
         decoration: InputDecoration(
           icon: icon,
           errorText: errorText,

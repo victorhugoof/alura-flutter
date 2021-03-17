@@ -4,6 +4,7 @@ class CenteredMessage extends StatelessWidget {
   final String message;
   final String legend;
   final IconData icon;
+  final Color iconColor;
   final double iconSize;
   final double fontSize;
   final double legendSize;
@@ -12,9 +13,10 @@ class CenteredMessage extends StatelessWidget {
     @required this.message,
     this.legend,
     this.icon,
-    this.iconSize = 64,
-    this.fontSize = 24,
-    this.legendSize = 12,
+    this.iconColor,
+    this.iconSize = 96,
+    this.fontSize = 32,
+    this.legendSize = 16,
   });
 
   @override
@@ -28,11 +30,12 @@ class CenteredMessage extends StatelessWidget {
             child: Icon(
               icon,
               size: iconSize,
+              color: iconColor,
             ),
             visible: icon != null,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 24.0),
+            padding: const EdgeInsets.only(top: 16.0),
             child: Text(
               message,
               style: TextStyle(fontSize: fontSize),

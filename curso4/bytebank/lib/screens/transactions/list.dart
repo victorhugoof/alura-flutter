@@ -1,13 +1,12 @@
 import 'package:bytebank/components/centered_error.dart';
 import 'package:bytebank/components/centered_message.dart';
-import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/components/centered_progress.dart';
 import 'package:bytebank/models/transaction.dart';
 import 'package:bytebank/service/service_factory.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const _labelAppBar = 'Transaction Feed';
-const _listErrorText = 'Unknown error';
 const _listEmptyText = 'No transactions found';
 
 class TransactionList extends StatefulWidget {
@@ -28,13 +27,12 @@ class _TransactionListState extends State<TransactionList> {
         future: _listTransactions(),
         builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return Progress();
+            return CenteredProgress();
           }
 
           if (snapshot.hasError) {
             return CenteredError(
               error: snapshot.error,
-              errorText: _listErrorText,
             );
           }
 
@@ -42,6 +40,7 @@ class _TransactionListState extends State<TransactionList> {
             return CenteredMessage(
               message: _listEmptyText,
               icon: Icons.warning,
+              iconColor: Colors.deepOrange,
             );
           }
 

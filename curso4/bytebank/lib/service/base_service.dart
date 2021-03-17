@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:bytebank/exception/service_exception.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 
-abstract class Service {
+abstract class BaseService {
   @protected
   Future<Response> get(String url, {Map<String, String> headers}) async {
     final Response response = await _getClient().get(
@@ -106,7 +107,10 @@ abstract class Service {
   }
 
   Client _getClient() {
-    return HttpClientWithInterceptor.build(interceptors: [_LoggingInterceptor()]);
+    return HttpClientWithInterceptor.build(
+      interceptors: [_LoggingInterceptor()],
+      requestTimeout: Duration(seconds: 10),
+    );
   }
 }
 

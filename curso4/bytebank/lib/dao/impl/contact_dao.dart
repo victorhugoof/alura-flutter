@@ -1,8 +1,8 @@
-import 'package:bytebank/dao/dao.dart';
+import 'package:bytebank/dao/base_dao.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-class ContactDao extends Dao {
+class ContactDao extends BaseDao {
   @override
   Future<void> onCreate(Database database, int version) async {
     await database.execute(' CREATE TABLE contacts( '

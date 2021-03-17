@@ -1,6 +1,6 @@
 import 'package:bytebank/components/centered_error.dart';
 import 'package:bytebank/components/centered_message.dart';
-import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/components/centered_progress.dart';
 import 'package:bytebank/dao/dao_factory.dart';
 import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
@@ -14,7 +14,6 @@ const _messageContactEdited = 'Contact edited successfully!';
 const _messageContactDeleted = 'Contact deleted successfully!';
 const _labelButtonEdit = 'Edit';
 const _labelButtonDelete = 'Delete';
-const _listErrorText = 'Unknown error';
 const _listEmptyText = 'No contacts found';
 
 class ContactList extends StatefulWidget {
@@ -35,13 +34,12 @@ class _ContactListState extends State<ContactList> {
         future: _listContacts(),
         builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return Progress();
+            return CenteredProgress();
           }
 
           if (snapshot.hasError) {
             return CenteredError(
               error: snapshot.error,
-              errorText: _listErrorText,
             );
           }
 
@@ -49,6 +47,7 @@ class _ContactListState extends State<ContactList> {
             return CenteredMessage(
               message: _listEmptyText,
               icon: Icons.warning,
+              iconColor: Colors.deepOrange,
             );
           }
 
@@ -102,7 +101,7 @@ class _ContactListState extends State<ContactList> {
         });
       }).catchError((e, s) {
         Utils.logError(e, s);
-        Utils.showSnackbar(context, '$e');
+        Utils.showSnackbarError(context, e);
       });
     }
   }

@@ -1,6 +1,6 @@
 import 'package:bytebank/components/centered_error.dart';
 import 'package:bytebank/components/centered_message.dart';
-import 'package:bytebank/components/progress.dart';
+import 'package:bytebank/components/centered_progress.dart';
 import 'package:bytebank/dao/dao_factory.dart';
 import 'package:bytebank/helper/utils.dart';
 import 'package:bytebank/models/contact.dart';
@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 
 const _labelAppBar = 'Transactions';
 const _messageTransactionCreated = 'Transaction created successfully!';
-const _listErrorText = 'Unknown error';
 const _listEmptyText = 'No contacts found';
 
 class TransferList extends StatefulWidget {
@@ -32,13 +31,12 @@ class _TransferListState extends State<TransferList> {
         future: _listContacts(),
         builder: (contextFutureBuilder, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return Progress();
+            return CenteredProgress();
           }
 
           if (snapshot.hasError) {
             return CenteredError(
               error: snapshot.error,
-              errorText: _listErrorText,
             );
           }
 
@@ -46,6 +44,7 @@ class _TransferListState extends State<TransferList> {
             return CenteredMessage(
               message: _listEmptyText,
               icon: Icons.warning,
+              iconColor: Colors.deepOrange,
             );
           }
 
@@ -86,12 +85,14 @@ class _TransferListState extends State<TransferList> {
 
   void _newContactAndTransaction(BuildContext context) {
     Utils.pushRoute<Transaction>(context, () => TransactionForm(contact: null)).then((value) {
-      if (value != null) {
-        setState(() {
+      setState(() {
+        if (value != null) {
           this._contacts.add(value.contact);
           Utils.showSnackbar(context, _messageTransactionCreated);
-        });
-      }
+        } else {
+          this._contacts = null;
+        }
+      });
     });
   }
 }

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 class Transaction {
   final String id;
-  double value;
-  Contact contact;
-  DateTime dateTime;
+  final double value;
+  final Contact contact;
+  final DateTime dateTime;
 
   Transaction({
-    this.id,
+    @required this.id,
     @required this.value,
     @required this.contact,
     this.dateTime,

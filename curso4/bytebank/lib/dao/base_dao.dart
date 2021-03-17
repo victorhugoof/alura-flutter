@@ -3,7 +3,7 @@ import 'package:bytebank/main.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class Dao {
+abstract class BaseDao {
   Future<void> onCreate(Database dao, int version);
 
   Future<void> onUpgrade(Database dao, int oldVersion, int newVersion) async {}

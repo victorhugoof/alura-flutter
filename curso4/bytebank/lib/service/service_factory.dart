@@ -1,12 +1,12 @@
+import 'package:bytebank/service/base_service.dart';
 import 'package:bytebank/service/impl/transaction_service.dart';
-import 'package:bytebank/service/service.dart';
 
 typedef ServiceCreator<T> = T Function();
 
 abstract class ServiceFactory {
   static final Map<Type, dynamic> _instances = {};
 
-  static T _getService<T extends Service>(ServiceCreator<T> _creator) {
+  static T _getService<T extends BaseService>(ServiceCreator<T> _creator) {
     Type type = T;
     if (!_instances.containsKey(type)) {
       _instances[type] = _creator();

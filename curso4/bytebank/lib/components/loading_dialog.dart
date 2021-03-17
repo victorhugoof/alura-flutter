@@ -14,7 +14,7 @@ class LoadingDialog extends StatelessWidget {
     return AlertDialog(
       title: Visibility(
         child: Text(title),
-        visible: title.isNotEmpty,
+        visible: title != null && title.isNotEmpty,
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -44,7 +44,7 @@ class LoadingDialog extends StatelessWidget {
                 ),
               ),
             ),
-            visible: message.isNotEmpty,
+            visible: message != null && message.isNotEmpty,
           )
         ],
       ),

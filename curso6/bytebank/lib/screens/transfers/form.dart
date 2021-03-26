@@ -66,7 +66,10 @@ class _TransactionFormState extends State<TransactionForm> {
                 visible: _sending,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Progress(),
+                  child: Progress(
+                    size: 40,
+                    strokeWidth: 3,
+                  ),
                 ),
               ),
               ..._getContactForm(context),
@@ -76,7 +79,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 fontSize: 24.0,
                 hintText: _hintValue,
                 margin: const EdgeInsets.only(top: 16.0),
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
                 readOnly: _sending,
               ),
               Padding(

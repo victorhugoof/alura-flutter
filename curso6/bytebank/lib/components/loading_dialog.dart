@@ -1,3 +1,4 @@
+import 'package:bytebank/components/progress.dart';
 import 'package:flutter/material.dart';
 
 class LoadingDialog extends StatelessWidget {
@@ -21,30 +22,13 @@ class LoadingDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 80,
-                width: 80,
-                child: CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Progress(
+              size: 64,
+              message: message,
+              fontSize: 20,
             ),
-          ),
-          Visibility(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24.0,
-                ),
-              ),
-            ),
-            visible: message != null && message.isNotEmpty,
           )
         ],
       ),

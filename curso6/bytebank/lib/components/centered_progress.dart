@@ -1,19 +1,14 @@
+import 'package:bytebank/components/progress.dart';
 import 'package:flutter/material.dart';
 
 class CenteredProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final progressWidth = (MediaQuery.of(context).size.width * 0.4).roundToDouble();
-    final strokeWidth = progressWidth / 20;
+    final progressSize = (MediaQuery.of(context).size.width * 0.3).roundToDouble();
 
     return Center(
-      child: SizedBox(
-        height: progressWidth,
-        width: progressWidth,
-        child: CircularProgressIndicator(
-          strokeWidth: strokeWidth,
-          valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-        ),
+      child: Progress(
+        size: progressSize,
       ),
     );
   }

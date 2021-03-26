@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 final primaryColor = Colors.green[900];
 final primaryColorLight = Colors.white;
 final accentColor = Colors.blueAccent[700];
+
 final bytebankTheme = ThemeData.light().copyWith(
   primaryColor: primaryColor,
   primaryColorLight: primaryColorLight,
